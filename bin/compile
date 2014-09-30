@@ -95,7 +95,6 @@ elif test -d $cache_dir/node/node_modules; then
     status "Node version changed since last build; rebuilding dependencies"
     npm rebuild 2>&1 | indent
   fi
-
 fi
 
 status "Installing dependencies"
@@ -129,6 +128,22 @@ rm -rf "$build_dir/.node-gyp"
 rm -rf "$build_dir/.npm"
 
 
-status "Building Ember CLI application $build_env distribution"
+# Restore bower_components from cache if it exists
+if test -d $cache_dir/bower_components; then
+  status "Restoring bower_components directory from cache"
+  cp -r $cache_dir/bower_components $build_dir/
+
+  status "Pruning cached bower dependencies not specified in bower.json"
+  node_modules/.bin/bower prune 2>&1 | indent
+fi
+
 node_modules/.bin/bower install --quiet | indent
+
+# If app has a bower_components directory, cache it.
+if test -d $build_dir/bower_components; then
+  status "Caching bower_components directory for future builds"
+  cp -r $build_dir/bower_components $cache_dir/
+fi
+
+status "Building Ember CLI application $build_env distribution"
 node_modules/ember-cli/bin/ember build --environment $build_env | indent
