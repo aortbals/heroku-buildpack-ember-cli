@@ -97,6 +97,15 @@ elif test -d $cache_dir/node/node_modules; then
   fi
 fi
 
+# Restore bower_components from cache if it exists
+if test -d $cache_dir/bower_components; then
+  status "Restoring bower_components directory from cache"
+  cp -r $cache_dir/bower_components $build_dir/
+
+  status "Pruning cached bower dependencies not specified in bower.json"
+  node_modules/.bin/bower prune 2>&1 | indent
+fi
+
 status "Installing dependencies"
 # Make npm output to STDOUT instead of its default STDERR
 npm install bower --quiet 2>&1 | indent
@@ -126,16 +135,6 @@ cp -r $build_dir/.heroku $cache_dir/node
 status "Cleaning up node-gyp and npm artifacts"
 rm -rf "$build_dir/.node-gyp"
 rm -rf "$build_dir/.npm"
-
-
-# Restore bower_components from cache if it exists
-if test -d $cache_dir/bower_components; then
-  status "Restoring bower_components directory from cache"
-  cp -r $cache_dir/bower_components $build_dir/
-
-  status "Pruning cached bower dependencies not specified in bower.json"
-  node_modules/.bin/bower prune 2>&1 | indent
-fi
 
 node_modules/.bin/bower install --quiet | indent
 
