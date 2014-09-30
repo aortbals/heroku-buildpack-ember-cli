@@ -110,7 +110,6 @@ fi
 
 status "Installing dependencies"
 # Make npm output to STDOUT instead of its default STDERR
-npm install bower --quiet 2>&1 | indent
 npm install --quiet --userconfig $build_dir/.npmrc --production 2>&1 | indent
 
 # Persist goodies like node-version in the slug
