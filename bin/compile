@@ -108,9 +108,13 @@ elif test -d $cache_dir/bower_components; then
   node_modules/.bin/bower prune 2>&1 | indent
 fi
 
+if ! npm list --parseable bower ; then
+  status "Installing bower"
+  npm install bower --quiet 2>&1 | indent
+fi
+
 status "Installing dependencies"
 # Make npm output to STDOUT instead of its default STDERR
-npm install bower --quiet 2>&1 | indent
 npm install --quiet --userconfig $build_dir/.npmrc 2>&1 | indent
 
 # Persist goodies like node-version in the slug
