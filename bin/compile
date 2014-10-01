@@ -108,7 +108,7 @@ elif test -d $cache_dir/bower_components; then
   node_modules/.bin/bower prune 2>&1 | indent
 fi
 
-if ! npm list --parseable bower ; then
+if ! npm list --parseable bower &>/dev/null ; then
   status "Installing bower"
   npm install bower --quiet 2>&1 | indent
 fi
