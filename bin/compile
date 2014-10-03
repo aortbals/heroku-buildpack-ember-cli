@@ -97,6 +97,13 @@ elif test -d $cache_dir/node/node_modules; then
   fi
 fi
 
+status "Installing dependencies"
+# Make npm output to STDOUT instead of its default STDERR
+npm install --quiet --userconfig $build_dir/.npmrc 2>&1 | indent
+
+# Add ember-cli's dependencies' binaries to the PATH
+PATH=$build_dir/node_modules/ember-cli/node_modules/.bin:$PATH
+
 # Restore bower_components from cache if it exists
 if test -d $build_dir/bower_components; then
   status "Found existing bower_components directory; skipping cache"
@@ -105,13 +112,8 @@ elif test -d $cache_dir/bower_components; then
   cp -r $cache_dir/bower_components $build_dir/
 
   status "Pruning cached bower dependencies not specified in bower.json"
-  node_modules/.bin/bower prune 2>&1 | indent
+  bower prune 2>&1 | indent
 fi
-
-status "Installing dependencies"
-# Make npm output to STDOUT instead of its default STDERR
-npm install bower --quiet 2>&1 | indent
-npm install --quiet --userconfig $build_dir/.npmrc 2>&1 | indent
 
 # Persist goodies like node-version in the slug
 mkdir -p $build_dir/.heroku
@@ -138,7 +140,7 @@ status "Cleaning up node-gyp and npm artifacts"
 rm -rf "$build_dir/.node-gyp"
 rm -rf "$build_dir/.npm"
 
-node_modules/.bin/bower install --quiet | indent
+bower install --quiet | indent
 
 # If app has a bower_components directory, cache it.
 if test -d $build_dir/bower_components; then
