@@ -105,16 +105,12 @@ elif test -d $cache_dir/bower_components; then
   cp -r $cache_dir/bower_components $build_dir/
 fi
 
-status "Installing bower which is required by other dependencies"
-npm install bower --quiet --userconfig $build_dir/.npmrc 2>&1 | indent
-PATH=$build_dir/node_modules/bower/bin:$PATH
+# Add the project's and ember-cli's dependencies' binaries to the PATH
+PATH=$build_dir/node_modules/.bin:$build_dir/node_modules/ember-cli/node_modules/.bin:$PATH
 
 status "Installing dependencies"
 # Make npm output to STDOUT instead of its default STDERR
 npm install --quiet --userconfig $build_dir/.npmrc 2>&1 | indent
-
-# Add the project's and ember-cli's dependencies' binaries to the PATH
-PATH=$build_dir/node_modules/.bin:$build_dir/node_modules/ember-cli/node_modules/.bin:$PATH
 
 status "Pruning cached bower dependencies not specified in bower.json"
 bower prune 2>&1 | indent
@@ -154,3 +150,4 @@ fi
 
 status "Building Ember CLI application $build_env distribution"
 node_modules/ember-cli/bin/ember build --environment $build_env | indent
+grunt 
