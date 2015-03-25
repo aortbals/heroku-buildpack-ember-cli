@@ -104,9 +104,16 @@ elif test -d $cache_dir/bower_components; then
   cp -r $cache_dir/bower_components $build_dir/
 fi
 
-status "Installing bower which is required by other dependencies"
-npm install bower --quiet --userconfig $build_dir/.npmrc 2>&1 | indent
-PATH=$build_dir/node_modules/bower/bin:$PATH
+# Add ember-cli's bower binary to the path
+PATH=$build_dir/node_modules/ember-cli/node_modules/bower/bin:$PATH
+
+if hash bower 2>/dev/null; then
+  status "Using ember-cli installed bower"
+else
+  status "Installing bower which is required by other dependencies"
+  npm install bower --quiet --userconfig $build_dir/.npmrc 2>&1 | indent
+  PATH=$build_dir/node_modules/bower/bin:$PATH
+fi
 
 if [ -d "$env_dir" ]; then
   status "Exporting config vars to environment"
